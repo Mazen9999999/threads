@@ -2,6 +2,10 @@ import { formatDateString } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { ActionsMenu } from "./ActionsMenu";
+import { DeleteButton } from "./DeleteButton";
+import { LikeButton } from "./LikeButton";
+import { fetchUser } from "@/lib/actions/user.action";
+import { fetchThreadById } from "@/lib/actions/thread.actions";
 
 interface Props {
     id: string;
@@ -27,7 +31,7 @@ interface Props {
     isComment?: boolean;
 }
 
-const ThreadCard = ({
+const ThreadCard = async ({
     id,
     currentUserId,
     parentId,
@@ -38,6 +42,9 @@ const ThreadCard = ({
     comments,
     isComment,
 }: Props) => {
+    const userInfo = await fetchUser(currentUserId)
+    const post = await fetchThreadById(id)
+    
     return (
         <article className={`flex w-full flex-col relative rounded-xl ${isComment ? 'px-0 xs:px-7' : 'bg-dark-2 p-7'}`}>
             <div className="flex items-start justify-between">
@@ -63,15 +70,11 @@ const ThreadCard = ({
                         <p className="mt-2 text-small-regular text-light-2">{content}</p>
 
                         <div className={`${isComment && 'mb-10'} mt-5 flex flex-col gap-3`}>
-                            <div className="flex gap-3.5">
-                                <Image
-                                    src={"/assets/heart-gray.svg"}
-                                    alt="heart"
-                                    width={24}
-                                    height={24}
-                                    className="cursor-pointer object-contain"
-                                />
-                                <Link className="flex flex-col items-center" href={`/thread/${id}`}>
+                            <div className="flex relative gap-3.5">
+
+                                <LikeButton id={JSON.stringify(id)} currentUserId={JSON.stringify(userInfo._id)} post={JSON.stringify(post)} />
+
+                                <Link className="flex flex-col gap-1.5 items-center" href={`/thread/${id}`}>
                                     <Image
                                         src={"/assets/reply.svg"}
                                         alt="comment"
@@ -79,22 +82,25 @@ const ThreadCard = ({
                                         height={24}
                                         className="cursor-pointer object-contain"
                                     />
-
+                                    <span className="text-light-2 text-tiny-medium"> {comments?.length || 0} </span>
                                 </Link>
-                                <Image
-                                    src={"/assets/repost.svg"}
-                                    alt="repost"
-                                    width={24}
-                                    height={24}
-                                    className="cursor-pointer object-contain"
-                                />
-                                {/* <Image
-                                    src={"/assets/share.svg"}
-                                    alt="share"
-                                    width={24}
-                                    height={24}
-                                    className="cursor-pointer object-contain"
-                                /> */}
+                                <div className="flex flex-col gap-1.5 items-center">
+
+                                    <Image
+                                        src={"/assets/repost.svg"}
+                                        alt="repost"
+                                        width={24}
+                                        height={24}
+                                        className="cursor-pointer object-contain"
+                                    />
+                                    <span className="text-light-2 text-tiny-medium"> 0 </span>
+
+                                </div>
+
+                                {author.id === currentUserId && (
+                                    <DeleteButton postId={id} />
+                                )}
+
                             </div>
                             {isComment && comments.length > 0 && (
                                 <Link href={`/thread/${id}`}>
@@ -102,17 +108,18 @@ const ThreadCard = ({
                                 </Link>
                             )}
 
+
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            
-{author.id === currentUserId && (
-    <ActionsMenu postId={id} />
-)}
-            
+
+            {author.id === currentUserId && (
+                <ActionsMenu />
+            )}
+
 
             {!isComment && community && (
                 <Link href={`/communities/${community.id}`} className="mt-5 flex items-center">

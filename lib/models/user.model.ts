@@ -12,6 +12,12 @@ const userSchema = new mongoose.Schema({
             ref: 'Thread'
         }
     ],
+    likedPosts: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Thread",
+        }
+    ],
     onboarded: {
         type: Boolean,
         default: false
@@ -21,7 +27,8 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Community'
         }
-    ]
+    ],
+    lastViewed: { type: Date, default: null }, 
 });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

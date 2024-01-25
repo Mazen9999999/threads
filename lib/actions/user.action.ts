@@ -8,6 +8,7 @@ import Thread from "../models/thread.model";
 import User from "../models/user.model";
 
 import { connectToDB } from "../mongoose";
+import Like from "../models/like.model";
 
 export async function fetchUser(userId: string) {
   try {
@@ -175,9 +176,28 @@ export async function getActivity(userId: string) {
       select: "name image _id",
     });
 
-    return replies;
-  } catch (error) {
+    // Collect all the child thread ids (replies) from the 'children' field of each user thread
+    const likesIds = userThreads.reduce((acc, userThread) => {
+      return acc.concat(userThread.likes);
+    }, []);
+
+    // Find and return the child threads (replies) excluding the ones created by the same user
+    const likes = await Like.find({ _id: { $in: likesIds } }).populate('likedPost likedUser');
+    
+    return { replies, likes };
+  } catch (error: any) {
     console.error("Error fetching replies: ", error);
+    throw error;
+  }
+}
+
+// Update lastViewed when user views activities
+export async function updateLastViewed(userId: string) {
+  try {
+    connectToDB();
+    await User.findByIdAndUpdate(userId, { lastViewed: new Date() });
+  } catch (error) {
+    console.error("Error updating lastViewed: ", error);
     throw error;
   }
 }

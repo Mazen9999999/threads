@@ -7,6 +7,7 @@ import { connectToDB } from "../mongoose";
 import User from "../models/user.model";
 import Thread from "../models/thread.model";
 import Community from "../models/community.model";
+import Like from "../models/like.model";
 
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
   connectToDB();
@@ -239,13 +240,70 @@ export async function addCommentToThread(
   }
 }
 
-export async function deletePost (postId: string, path: string) {
+export async function deletePost(postId: string, path: string) {
   try {
     connectToDB();
 
-    await Thread.findOneAndDelete({_id: postId});
+    await Thread.findOneAndDelete({ _id: postId });
     revalidatePath(path);
   } catch (error) {
     throw new Error(`Error In Deleting The Post: ${error}`)
   }
+}
+
+export async function likePost({ postId, userId, path }: { postId: string, userId: string, path: string }) {
+  try {
+    connectToDB();
+
+    const post = await Thread.findById(postId)
+
+    const like = new Like({ likedPost: postId, likedUser: userId })
+    await like.save();
+
+    post.likes.push(like._id)
+    await post.save();
+
+
+    revalidatePath(path);
+  } catch (error) {
+    throw new Error(`Error like the post: ${error}`)
+  }
+}
+
+export async function unLikePost({ postId, userId, path }: { postId: string, userId: string, path: string }) {
+  try {
+    connectToDB();
+
+    const like = await Like.findOne({ likedPost: postId, likedUser: userId })
+
+    console.log("The unlike:", like)
+
+    await Like.findByIdAndDelete(like._id);
+
+    revalidatePath(path)
+  } catch (error) {
+    throw new Error(`Error unLike the post: ${error}`)
+  }
+}
+
+export async function getInitialLikeState ({postId, userId}: {postId: string, userId: string}) {
+try {
+  connectToDB();
+
+  const like = await Like.findOne({ likedPost: postId, likedUser: userId });
+  const likeCount = await Like.countDocuments({ likedPost: postId });
+
+  return {
+    isLiked: !!like,
+    likeCount,
+  };
+ 
+
+} catch (error) {
+   console.error('Error checking initial like state:', error);
+   return {
+    isLiked: false,
+    likeCount: 0,
+  }; // Return false in case of an error
+}
 }

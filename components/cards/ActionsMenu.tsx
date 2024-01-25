@@ -12,7 +12,7 @@ import {
   } from "@/components/ui/menubar"
   import { usePathname } from "next/navigation";
 
-export const ActionsMenu = ({ postId }: { postId: string }) => {
+export const ActionsMenu = () => {
 
     const path = usePathname();
 
