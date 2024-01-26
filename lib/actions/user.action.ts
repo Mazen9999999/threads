@@ -169,6 +169,7 @@ export async function getActivity(userId: string) {
     // Find and return the child threads (replies) excluding the ones created by the same user
     const replies = await Thread.find({
       _id: { $in: childThreadIds },
+      author: { $ne: userId },
     })
       .populate({
         path: 'author',
@@ -183,7 +184,7 @@ export async function getActivity(userId: string) {
     }, []);
 
     // Find and return the likes
-    const likes = await Like.find({ _id: { $in: likesIds } })
+    const likes = await Like.find({ _id: { $in: likesIds }, likedUser: {$ne: userId} })
       .populate('likedPost likedUser')
       .sort({ createdAt: 'desc' });
 
@@ -228,6 +229,7 @@ export async function hasUnviewedActivities(userId: string) {
     // Find new replies (comments on your posts) based on the lastViewed timestamp
     const newReplies = await Thread.find({
       _id: { $in: childThreadIds },
+      author: {$ne: userId},
       createdAt: { $gt: lastViewed },
     });
 
@@ -239,6 +241,7 @@ export async function hasUnviewedActivities(userId: string) {
     // Find new likes on your posts based on the lastViewed timestamp
     const newLikes = await Like.find({
       _id: { $in: likesIds },
+      likedUser: {$ne: userId},
       createdAt: { $gt: lastViewed },
     });
 
