@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
             ref: 'Community'
         }
     ],
-    lastViewed: { type: Date, default: null }, 
+    lastViewed: { type: Date, default: null },
 });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

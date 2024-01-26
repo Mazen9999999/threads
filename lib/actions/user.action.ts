@@ -169,11 +169,66 @@ export async function getActivity(userId: string) {
     // Find and return the child threads (replies) excluding the ones created by the same user
     const replies = await Thread.find({
       _id: { $in: childThreadIds },
-      author: { $ne: userId }, // Exclude threads authored by the same user
-    }).populate({
-      path: "author",
-      model: User,
-      select: "name image _id",
+    })
+      .populate({
+        path: 'author',
+        model: User,
+        select: 'name image _id',
+      })
+      .sort({ createdAt: 'desc' });
+
+    // Collect all the child thread ids (replies) from the 'children' field of each user thread
+    const likesIds = userThreads.reduce((acc, userThread) => {
+      return acc.concat(userThread.likes);
+    }, []);
+
+    // Find and return the likes
+    const likes = await Like.find({ _id: { $in: likesIds } })
+      .populate('likedPost likedUser')
+      .sort({ createdAt: 'desc' });
+
+    // Combine and sort replies and likes
+    const activities = [...replies, ...likes].sort((a, b) => b.createdAt - a.createdAt);
+
+    return { activities };
+  } catch (error: any) {
+    console.error('Error fetching activities: ', error);
+    throw error;
+  }
+}
+
+
+// Update lastViewed when user views activities
+export async function updateLastViewed(userId: string, path: string) {
+  try {
+    connectToDB();
+    await User.findByIdAndUpdate(userId, { lastViewed: new Date() });
+    revalidatePath(path);
+  } catch (error) {
+    console.error("Error updating lastViewed: ", error);
+    throw error;
+  }
+}
+
+export async function hasUnviewedActivities(userId: string, path: string) {
+  try {
+    connectToDB();
+
+    // Find all threads created by the user
+    const userThreads = await Thread.find({ author: userId });
+
+    // Collect all the child thread ids (replies) from the 'children' field of each user thread
+    const childThreadIds = userThreads.reduce((acc, userThread) => {
+      return acc.concat(userThread.children);
+    }, []);
+
+    // Fetch the user's lastViewed timestamp
+    const { lastViewed } = await User.findById(userId, 'lastViewed');
+
+    // Find new replies (comments on your posts) based on the lastViewed timestamp
+    const newReplies = await Thread.find({
+      _id: { $in: childThreadIds },
+      createdAt: { $gt: lastViewed },
     });
 
     // Collect all the child thread ids (replies) from the 'children' field of each user thread
@@ -181,23 +236,17 @@ export async function getActivity(userId: string) {
       return acc.concat(userThread.likes);
     }, []);
 
-    // Find and return the child threads (replies) excluding the ones created by the same user
-    const likes = await Like.find({ _id: { $in: likesIds } }).populate('likedPost likedUser');
-    
-    return { replies, likes };
-  } catch (error: any) {
-    console.error("Error fetching replies: ", error);
-    throw error;
-  }
-}
+    // Find new likes on your posts based on the lastViewed timestamp
+    const newLikes = await Like.find({
+      _id: { $in: likesIds },
+      createdAt: { $gt: lastViewed },
+    });
 
-// Update lastViewed when user views activities
-export async function updateLastViewed(userId: string) {
-  try {
-    connectToDB();
-    await User.findByIdAndUpdate(userId, { lastViewed: new Date() });
+    revalidatePath(path);
+    // Check if there are any new activities
+    return newReplies.length + newLikes.length;
   } catch (error) {
-    console.error("Error updating lastViewed: ", error);
+    console.error('Error checking for unviewed activities:', error);
     throw error;
   }
 }
