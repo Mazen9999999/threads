@@ -27,7 +27,15 @@ export const LeftNav = ({ currentUserId }: { currentUserId: string }) => {
         };
 
         checkUnviewedActivities();
-    }, [userId]);
+
+         // Set up a timer to periodically check for new activities (adjust the interval as needed)
+         const intervalId = setInterval(() => {
+            checkUnviewedActivities();
+        }, 180000); // Check every 30 seconds
+
+        // Clean up the interval when the component is unmounted
+        return () => clearInterval(intervalId);
+    }, [currentUserId, pathname]);
 
     return (
         <>
