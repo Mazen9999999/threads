@@ -13,14 +13,13 @@ export const LeftNav = ({ currentUserId }: { currentUserId: string }) => {
     const router = useRouter();
     const pathname = usePathname();
     const { userId } = useAuth();
-    const path = usePathname();
 
     const [hasUnviewed, setHasUnviewed] = useState(0);
 
     useEffect(() => {
         const checkUnviewedActivities = async () => {
             try {
-                const unviewed = await hasUnviewedActivities(currentUserId, path);
+                const unviewed = await hasUnviewedActivities(currentUserId);
                 setHasUnviewed(unviewed);
             } catch (error) {
                 console.error('Error checking unviewed activities:', error);
@@ -28,7 +27,7 @@ export const LeftNav = ({ currentUserId }: { currentUserId: string }) => {
         };
 
         checkUnviewedActivities();
-    }, [currentUserId, path]);
+    }, [userId]);
 
     return (
         <>

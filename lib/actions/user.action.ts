@@ -210,7 +210,7 @@ export async function updateLastViewed(userId: string, path: string) {
   }
 }
 
-export async function hasUnviewedActivities(userId: string, path: string) {
+export async function hasUnviewedActivities(userId: string) {
   try {
     connectToDB();
 
@@ -242,7 +242,6 @@ export async function hasUnviewedActivities(userId: string, path: string) {
       createdAt: { $gt: lastViewed },
     });
 
-    revalidatePath(path);
     // Check if there are any new activities
     return newReplies.length + newLikes.length;
   } catch (error) {
