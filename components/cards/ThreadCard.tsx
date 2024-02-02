@@ -12,6 +12,7 @@ interface Props {
     currentUserId: string;
     parentId: string | null;
     content: string;
+    image?: string;
     author: {
         name: string;
         image: string;
@@ -36,6 +37,7 @@ const ThreadCard = async ({
     currentUserId,
     parentId,
     content,
+    image,
     author,
     community,
     createdAt,
@@ -44,10 +46,10 @@ const ThreadCard = async ({
 }: Props) => {
     const userInfo = await fetchUser(currentUserId)
     const post = await fetchThreadById(id)
-    
+
     return (
-        <article className={`flex w-full flex-col relative rounded-xl ${isComment ? 'px-0 xs:px-7' : 'bg-dark-2 p-7'}`}>
-            <div className="flex items-start justify-between">
+        <article className={`flex w-full flex-col relative rounded-xl ${isComment ? 'px-0 xs:px-7' : 'bg-dark-2 p-7'} ${ image && "md:pb-16"}`}>
+            <div className="flex items-start justify-between relative">
                 <div className="flex w-full flex-1 flex-row gap-4">
                     <div className="flex flex-col items-center">
                         <Link href={`/profile/${author.id}`} className="relative h-11 w-11">
@@ -69,8 +71,21 @@ const ThreadCard = async ({
 
                         <p className="mt-2 text-small-regular text-light-2">{content}</p>
 
-                        <div className={`${isComment && 'mb-10'} mt-5 flex flex-col gap-3`}>
-                            <div className="flex relative gap-3.5">
+
+                        <div className={`${image && "xs:h-80 md:h-96 max-w-4xl md:mb-4"} mt-5 flex flex-col gap-3`}>
+
+                            {image ? (
+                                <Image
+                                    src={image}
+                                    alt="post image"
+                                    width={450}
+                                    height={500}
+                                    className="w-full h-full rounded-lg mt-1"
+                                />
+                            ) : null}
+
+
+                            <div className={`flex relative gap-3.5 `}>
 
                                 <LikeButton id={JSON.stringify(id)} currentUserId={JSON.stringify(userInfo._id)} post={JSON.stringify(post)} />
 

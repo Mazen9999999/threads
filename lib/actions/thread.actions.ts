@@ -52,11 +52,12 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
 interface Params {
   text: string,
   author: string,
+  image?: string,
   communityId: string | null,
   path: string,
 }
 
-export async function createThread({ text, author, communityId, path }: Params
+export async function createThread({ text, author, image, communityId, path }: Params
 ) {
   try {
     connectToDB();
@@ -69,6 +70,7 @@ export async function createThread({ text, author, communityId, path }: Params
     const createdThread = await Thread.create({
       text,
       author,
+      image,
       community: communityIdObject, // Assign communityId if provided, or leave it null for personal account
     });
 
@@ -240,17 +242,6 @@ export async function addCommentToThread(
   }
 }
 
-export async function deletePost(postId: string, path: string) {
-  try {
-    connectToDB();
-
-    await Thread.findOneAndDelete({ _id: postId });
-    revalidatePath(path);
-  } catch (error) {
-    throw new Error(`Error In Deleting The Post: ${error}`)
-  }
-}
-
 export async function likePost({ postId, userId, path }: { postId: string, userId: string, path: string }) {
   try {
     connectToDB();
@@ -286,24 +277,24 @@ export async function unLikePost({ postId, userId, path }: { postId: string, use
   }
 }
 
-export async function getInitialLikeState ({postId, userId}: {postId: string, userId: string}) {
-try {
-  connectToDB();
+export async function getInitialLikeState({ postId, userId }: { postId: string, userId: string }) {
+  try {
+    connectToDB();
 
-  const like = await Like.findOne({ likedPost: postId, likedUser: userId });
-  const likeCount = await Like.countDocuments({ likedPost: postId });
+    const like = await Like.findOne({ likedPost: postId, likedUser: userId });
+    const likeCount = await Like.countDocuments({ likedPost: postId });
 
-  return {
-    isLiked: !!like,
-    likeCount,
-  };
- 
+    return {
+      isLiked: !!like,
+      likeCount,
+    };
 
-} catch (error) {
-   console.error('Error checking initial like state:', error);
-   return {
-    isLiked: false,
-    likeCount: 0,
-  }; // Return false in case of an error
-}
+
+  } catch (error) {
+    console.error('Error checking initial like state:', error);
+    return {
+      isLiked: false,
+      likeCount: 0,
+    }; // Return false in case of an error
+  }
 }

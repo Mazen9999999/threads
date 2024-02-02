@@ -12,7 +12,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { deletePost } from '@/lib/actions/thread.actions';
+import { deleteThread } from '@/lib/actions/thread.actions';
 import { usePathname } from 'next/navigation';
 
 
@@ -33,7 +33,7 @@ export const DeleteButton = ({ postId }: { postId: string }) => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => deletePost(postId, path)}>Continue</AlertDialogAction>
+                    <AlertDialogAction onClick={() => deleteThread(postId, path)}>Continue</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
