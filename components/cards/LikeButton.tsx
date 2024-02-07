@@ -54,31 +54,33 @@ export const LikeButton = ({ id, currentUserId, post }: { id: string, currentUse
     return (
         <>
             <div className="flex flex-col items-center gap-1.5">
-              
+
                 {likeInfo.isLiked ? (
                     <button onClick={handleUnlike} disabled={!likeInfo.isLiked}>
-                         <Image
-                        src={"/assets/heart-filled.svg"}
-                        alt="liked"
-                        width={24}
-                        height={24}
-                        className="cursor-pointer object-contain"
-                    />
+                        <Image
+                            src={"/assets/heart-filled.svg"}
+                            alt="liked"
+                            width={24}
+                            height={24}
+                            className="cursor-pointer object-contain"
+                        />
                     </button>
                 ) : (
                     <button onClick={handleLike} disabled={likeInfo.isLiked}>
-                    <Image
-                        src={"/assets/heart-gray.svg"}
-                        alt="unliked"
-                        width={24}
-                        height={24}
-                        className="cursor-pointer object-contain"
-                    />
+                        <Image
+                            src={"/assets/heart-gray.svg"}
+                            alt="unliked"
+                            width={24}
+                            height={24}
+                            className="cursor-pointer object-contain"
+                        />
                     </button>
                 )}
-                  <span  className="text-light-2 text-tiny-medium">{likeInfo.likeCount}</span>
+                <p className="mt-1 text-subtle-medium text-gray-1">{likeInfo.likeCount}</p>
+
             </div>
 
         </>
     )
 }
+

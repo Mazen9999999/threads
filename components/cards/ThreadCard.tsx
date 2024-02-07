@@ -6,6 +6,7 @@ import { DeleteButton } from "./DeleteButton";
 import { LikeButton } from "./LikeButton";
 import { fetchUser } from "@/lib/actions/user.action";
 import { fetchThreadById } from "@/lib/actions/thread.actions";
+import './post.css'
 
 interface Props {
     id: string;
@@ -48,7 +49,8 @@ const ThreadCard = async ({
     const post = await fetchThreadById(id)
 
     return (
-        <article className={`flex w-full flex-col relative rounded-xl ${isComment ? 'px-0 xs:px-7' : 'bg-dark-2 p-7'} ${ image && "md:pb-16"}`}>
+        <>
+        <article className={`flex xs:w-screen md:w-full flex-col relative ${isComment ? 'px-6 xs:px-7  ' : ' md:bg-dark-2 p-5 -mx-6'} `}>
             <div className="flex items-start justify-between relative">
                 <div className="flex w-full flex-1 flex-row gap-4">
                     <div className="flex flex-col items-center">
@@ -72,20 +74,20 @@ const ThreadCard = async ({
                         <p className="mt-2 text-small-regular text-light-2">{content}</p>
 
 
-                        <div className={`${image && "xs:h-80 md:h-96 max-w-4xl md:mb-4"} mt-5 flex flex-col gap-3`}>
+                        <div className={`${image && "max-w-4xl"} mt-5 flex flex-col gap-3`}>
 
                             {image ? (
-                                <Image
-                                    src={image}
-                                    alt="post image"
-                                    width={450}
-                                    height={500}
-                                    className="w-full h-full rounded-lg mt-1"
-                                />
+                                <div className="relative image-container w-full object-cover">
+                                    <Image
+                                        src={image}
+                                        alt="post image"
+                                        fill
+                                        className="object-cover rounded-lg mt-1"
+                                    />
+                                </div>
                             ) : null}
 
-
-                            <div className={`flex relative gap-3.5 `}>
+                            <div className={`flex relative gap-3.5 ${image && "mt-3"}`}>
 
                                 <LikeButton id={JSON.stringify(id)} currentUserId={JSON.stringify(userInfo._id)} post={JSON.stringify(post)} />
 
@@ -97,10 +99,9 @@ const ThreadCard = async ({
                                         height={24}
                                         className="cursor-pointer object-contain"
                                     />
-                                    <span className="text-light-2 text-tiny-medium"> {comments?.length || 0} </span>
                                 </Link>
-                                <div className="flex flex-col gap-1.5 items-center">
 
+                                <div className="flex flex-col gap-1.5 items-center">
                                     <Image
                                         src={"/assets/repost.svg"}
                                         alt="repost"
@@ -108,8 +109,6 @@ const ThreadCard = async ({
                                         height={24}
                                         className="cursor-pointer object-contain"
                                     />
-                                    <span className="text-light-2 text-tiny-medium"> 0 </span>
-
                                 </div>
 
                                 {author.id === currentUserId && (
@@ -117,12 +116,13 @@ const ThreadCard = async ({
                                 )}
 
                             </div>
-                            {isComment && comments.length > 0 && (
+                            {comments.length > 0 && (
                                 <Link href={`/thread/${id}`}>
-                                    <p className="mt-1 text-subtle-medium text-gray-1">{comments.length} replies</p>
+                                    <p className="mt-1 text-subtle-medium text-gray-1">{comments.length < 99 ? comments.length : "99+"} {isComment ? "replies ." : "comments ."}</p>
                                 </Link>
                             )}
 
+                                    
 
                         </div>
                     </div>
@@ -131,9 +131,9 @@ const ThreadCard = async ({
             </div>
 
 
-            {author.id === currentUserId && (
+            {/* {author.id === currentUserId && (
                 <ActionsMenu />
-            )}
+            )} */}
 
 
             {!isComment && community && (
@@ -153,6 +153,8 @@ const ThreadCard = async ({
                 </Link>
             )}
         </article>
+        <hr className="bg-gray-800 w-full text-gray-800"/>
+        </>
     )
 }
 

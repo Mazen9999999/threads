@@ -8,9 +8,7 @@ export default async function Home() {
 
   return (
     <>
-      <h1 className="head-text text-left">Home</h1>
-
-      <section className="mt-9 flex flex-col gap-10">
+      <section className="mt-2 flex flex-col gap-2">
         {result.posts.length === 0 ? (
           <p className="no-result">No threads found</p>
         ) : (
@@ -29,6 +27,7 @@ export default async function Home() {
                 comments={post.children}
 
               />
+              
             ))}
           </>
         )}

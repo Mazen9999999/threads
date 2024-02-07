@@ -12,10 +12,10 @@ interface Props {
 
 const ProfileHeader = ({ accountId, authUserId, name, username, imgUrl, bio, type }: Props) => {
     return (
-        <div className="flex w-full flex-col justify-start">
+        <div className="flex w-full flex-col items-center justify-center">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="relative h-20 w-20 object-cover">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="relative h-24 w-24 object-cover">
                         <Image
                             src={imgUrl}
                             alt="Profile Image"
@@ -25,8 +25,8 @@ const ProfileHeader = ({ accountId, authUserId, name, username, imgUrl, bio, typ
                     </div>
 
                     <div className="flex-1">
-                        <h2 className="text-left text-heading3-bold text-light-1">{name}</h2>
-                        <p className="text-base-medium text-gray-1">@{username}</p>
+                        <h2 className="text-heading3-bold text-light-1">{name}</h2>
+                        <p className="text-base-medium text-center text-gray-1">@{username}</p>
                     </div>
                 </div>
             </div>

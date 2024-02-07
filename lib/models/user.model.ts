@@ -12,10 +12,16 @@ const userSchema = new mongoose.Schema({
             ref: 'Thread'
         }
     ],
-    likedPosts: [
+    followers: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Thread",
+            ref: 'User'
+        }
+    ],
+    following: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
         }
     ],
     onboarded: {

@@ -87,7 +87,11 @@ export async function fetchUserPosts(userId: string) {
           },
         },
       ],
-    });
+    }).lean();
+
+    // Sorting threads by createdAt field in descending order
+    threads.threads.sort((a, b) => b.createdAt - a.createdAt);
+
     return threads;
   } catch (error) {
     console.error("Error fetching user threads:", error);
@@ -184,7 +188,7 @@ export async function getActivity(userId: string) {
     }, []);
 
     // Find and return the likes
-    const likes = await Like.find({ _id: { $in: likesIds }, likedUser: {$ne: userId} })
+    const likes = await Like.find({ _id: { $in: likesIds }, likedUser: { $ne: userId } })
       .populate('likedPost likedUser')
       .sort({ createdAt: 'desc' });
 
@@ -229,7 +233,7 @@ export async function hasUnviewedActivities(userId: string) {
     // Find new replies (comments on your posts) based on the lastViewed timestamp
     const newReplies = await Thread.find({
       _id: { $in: childThreadIds },
-      author: {$ne: userId},
+      author: { $ne: userId },
       createdAt: { $gt: lastViewed },
     });
 
@@ -241,7 +245,7 @@ export async function hasUnviewedActivities(userId: string) {
     // Find new likes on your posts based on the lastViewed timestamp
     const newLikes = await Like.find({
       _id: { $in: likesIds },
-      likedUser: {$ne: userId},
+      likedUser: { $ne: userId },
       createdAt: { $gt: lastViewed },
     });
 
