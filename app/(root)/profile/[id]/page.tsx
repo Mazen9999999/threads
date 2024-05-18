@@ -22,6 +22,7 @@ async function Page({ params }: { params: { id: string } }) {
             <ProfileHeader
                 accountId={userInfo.id}
                 authUserId={user.id}
+                authorId={userInfo._id}
                 name={userInfo.name}
                 username={userInfo.username}
                 imgUrl={userInfo.image}

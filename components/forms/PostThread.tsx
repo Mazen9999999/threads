@@ -52,43 +52,47 @@ function PostThread({ userId, user }: { userId: string, user: any }) {
         defaultValues: {
             thread: "",
             accountId: userId,
-            image: null
+            image: ""
         }
     });
 
-    const handleImage = (e: ChangeEvent<HTMLInputElement>, fieldChange: (value: string) => void) => {
+    const handleImage = (e: ChangeEvent<HTMLInputElement>, fieldChange: (value: string | null) => void) => {
         e.preventDefault();
-
+    
         const fileReader = new FileReader();
-
+    
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
-
+    
             setFiles(Array.from(e.target.files));
-
+    
             if (!file.type.includes('image')) return;
-
+    
             fileReader.onload = async (event) => {
                 const imageDataUrl = event.target?.result?.toString() || "";
-
+    
                 fieldChange(imageDataUrl);
             }
-
+    
             fileReader.readAsDataURL(file);
+        } else {
+            fieldChange(null);
         }
-    }
+    };
+    
 
     const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
         await createThread({
             text: values.thread,
             author: userId,
-            image: values.image,
+            image: values.image ? values.image : "",
             communityId: organization ? organization.id : null,
-            path: pathname
+            path: pathname,
         });
-
-        router.push("/")
-    }
+    
+        router.push("/");
+    };
+    
 
     return (
         <Form {...form}>
@@ -121,7 +125,7 @@ function PostThread({ userId, user }: { userId: string, user: any }) {
                                 {field.value ? (
                                     <Image
                                         src={field.value}
-                                        alt="profile photo"
+                                        alt="post image"
                                         width={200}
                                         height={200}
                                         priority
@@ -129,7 +133,7 @@ function PostThread({ userId, user }: { userId: string, user: any }) {
                                 ) : (
                                     <Image
                                         src="/assets/profile.svg"
-                                        alt="profile photo"
+                                        alt="post image"
                                         width={24}
                                         height={24}
                                         className="object-contain" />

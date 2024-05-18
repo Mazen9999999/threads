@@ -1,4 +1,7 @@
 import Image from "next/image";
+import { ProfileFollowButton } from "./ProfileFollowButton";
+import { getFollowers } from "@/lib/actions/thread.actions";
+import { ProfileDetails } from "./ProfileDetails";
 
 interface Props {
     accountId: string;
@@ -7,10 +10,15 @@ interface Props {
     username: string;
     imgUrl: string;
     bio: string;
+    authorId: string;
     type?: 'User' | 'Community';
 }
 
-const ProfileHeader = ({ accountId, authUserId, name, username, imgUrl, bio, type }: Props) => {
+const ProfileHeader = async ({ accountId, authUserId, authorId, name, username, imgUrl, bio, type }: Props) => {
+
+    // let { followersNumber } = await getFollowers({ userId: authorId });
+    // let {followers} = await getFollowers({ userId: authorId });
+
     return (
         <div className="flex w-full flex-col items-center justify-center">
             <div className="flex items-center justify-between">
@@ -25,13 +33,19 @@ const ProfileHeader = ({ accountId, authUserId, name, username, imgUrl, bio, typ
                     </div>
 
                     <div className="flex-1">
-                        <h2 className="text-heading3-bold text-light-1">{name}</h2>
+                        <h2 className="text-heading3-bold text-center text-light-1">{name}</h2>
                         <p className="text-base-medium text-center text-gray-1">@{username}</p>
                     </div>
                 </div>
             </div>
 
+            <div className="flex items-center justify-center text-light-1 mt-6 gap-3 -ml-5">
+               <ProfileDetails userId={JSON.stringify(authorId)}/>
+            </div>
+
             <p className="mt-6 max-w-lg text-base-regular text-light-2">{bio}</p>
+
+            <ProfileFollowButton authorId={JSON.stringify(authorId)} userId={authUserId} />
 
             <div className="mt-12 h-0.5 w-full bg-dark-3" />
         </div>

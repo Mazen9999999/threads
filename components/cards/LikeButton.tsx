@@ -76,7 +76,7 @@ export const LikeButton = ({ id, currentUserId, post }: { id: string, currentUse
                         />
                     </button>
                 )}
-                <p className="mt-1 text-subtle-medium text-gray-1">{likeInfo.likeCount}</p>
+                {/* <p className="mt-1 text-subtle-medium text-gray-1">{likeInfo.likeCount}</p> */}
 
             </div>
 

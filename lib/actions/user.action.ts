@@ -256,3 +256,44 @@ export async function hasUnviewedActivities(userId: string) {
     throw error;
   }
 }
+
+export async function follow({ followedUserId, userId }: { followedUserId: string, userId: string }) {
+  try {
+    connectToDB();
+
+    await User.findByIdAndUpdate(
+      followedUserId,
+      { $addToSet: { followers: userId } },
+      { new: true }
+    );
+
+    await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { following: followedUserId } },
+      { new: true }
+    )
+
+  } catch (error) {
+    console.error('Error to follow this user:', error);
+  }
+}
+
+export async function unfollow({ followedUserId, userId }: { followedUserId: string, userId: string }) {
+  try {
+    connectToDB();
+
+    await User.findByIdAndUpdate(
+      followedUserId,
+      { $pull: { followers: userId } },
+      { new: true }
+    );
+
+    await User.findByIdAndUpdate(
+      userId,
+      { $pull: { following: followedUserId } },
+      { new: true }
+    )
+  } catch (error) {
+    console.error('Error to unfollow this user:', error);
+  }
+}

@@ -8,7 +8,7 @@ export default async function Home() {
 
   return (
     <>
-      <section className="mt-2 flex flex-col gap-2">
+      <section className="mt-2 flex flex-col gap-2 md:gap-10">
         {result.posts.length === 0 ? (
           <p className="no-result">No threads found</p>
         ) : (
@@ -25,7 +25,6 @@ export default async function Home() {
                 community={post.community}
                 createdAt={post.createdAt}
                 comments={post.children}
-
               />
               
             ))}

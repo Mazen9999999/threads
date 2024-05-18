@@ -2,7 +2,7 @@
 
 import UserCard from "@/components/cards/UserCard";
 import { fetchUsers } from "@/lib/actions/user.action";
-import { useState } from "react"
+import { useState } from "react";
 
 export const SearchUsers = ({ userId, allUsers }: any) => {
     const [search, setSearch] = useState("");

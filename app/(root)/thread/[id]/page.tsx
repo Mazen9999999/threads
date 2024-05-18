@@ -24,6 +24,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
                     id={thread._id}
                     currentUserId={user?.id || ""}
                     parentId={thread.parentId}
+                    image={thread.image}
                     content={thread.text}
                     author={thread.author}
                     community={thread.community}
