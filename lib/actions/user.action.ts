@@ -259,6 +259,11 @@ export async function hasUnviewedActivities(userId: string) {
 
 export async function follow({ followedUserId, userId }: { followedUserId: string, userId: string }) {
   try {
+    if (followedUserId === userId) {
+      console.log('A user cannot follow themselves.');
+      return;
+    }
+
     connectToDB();
 
     await User.findByIdAndUpdate(
@@ -282,6 +287,10 @@ export async function unfollow({ followedUserId, userId }: { followedUserId: str
   try {
     connectToDB();
 
+    if (followedUserId === userId) {
+      return;
+    }
+
     await User.findByIdAndUpdate(
       followedUserId,
       { $pull: { followers: userId } },
@@ -297,3 +306,5 @@ export async function unfollow({ followedUserId, userId }: { followedUserId: str
     console.error('Error to unfollow this user:', error);
   }
 }
+
+

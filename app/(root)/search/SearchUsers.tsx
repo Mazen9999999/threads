@@ -25,7 +25,7 @@ export const SearchUsers = ({ userId, allUsers }: any) => {
 
     return (
         <>
-            <input type="text" placeholder="Search for a user" onChange={handleSearch} />
+            <input className="bg-dark-2 px-7 py-2 rounded-2xl border border-light-4 text-light-2" type="text" placeholder="Search for a user" onChange={handleSearch} />
             <div className="mt-14 flex flex-col gap-9">
                 {result?.users?.length === 0 ? (
                     <p className="no-result">No users</p>

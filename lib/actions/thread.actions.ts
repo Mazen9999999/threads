@@ -326,6 +326,26 @@ export async function getFollowersIds({ authorId }: { authorId: string }) {
 export async function getFollowers({ userId }: { userId: string }) {
   try {
     connectToDB();
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new Error('User Not Found');
+    }
+
+    const followers = await User.find({ _id: { $in: user.followers } });
+    const followersNumber = followers.length;
+
+    return { followers, followersNumber };
+  } catch (error) {
+    console.error('Error in fetching users:', error);
+    throw new Error('Error in fetching users');
+  }
+}
+
+
+export async function getFollowing({ userId }: { userId: string }) {
+  try {
+    connectToDB();
 
     const user = await User.findById(userId);
 
@@ -333,10 +353,10 @@ export async function getFollowers({ userId }: { userId: string }) {
       throw new Error('User Not Found');
     }
 
-    const followers = user.followers;
-    const followersNumber = followers.length;
+    const following = user.following;
+    const followingNumber = following.length;
 
-    return { followers, followersNumber };
+    return { following, followingNumber };
   } catch (error) {
     throw new Error('Error in fetching users');
   }

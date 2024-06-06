@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 export const ProfileFollowButton = ({ authorId, userId }: { authorId: string, userId: string }) => {
     const [isFollowing, setIsFollowing] = useState(false);
+    const [isCurrentUser, setIsCurrentUser] = useState(false);
     const parsedAuthorId = JSON.parse(authorId);
 
     useEffect(() => {
@@ -15,6 +16,7 @@ export const ProfileFollowButton = ({ authorId, userId }: { authorId: string, us
             try {
                 const followersList = await getFollowersIds({ authorId: parsedAuthorId });
                 const isCurrentUserFollowing = followersList.includes(userInfo._id);
+                setIsCurrentUser(parsedAuthorId === userInfo._id);
                 setIsFollowing(isCurrentUserFollowing);
             } catch (error) {
                 console.error('Error checking if current user is following:', error);
@@ -25,7 +27,7 @@ export const ProfileFollowButton = ({ authorId, userId }: { authorId: string, us
     }, [parsedAuthorId, userId]);
 
 
-     const handleFollow = async () => {
+    const handleFollow = async () => {
         const userInfo = await fetchUser(userId);
         try {
             await follow({ followedUserId: parsedAuthorId, userId: userInfo._id });
@@ -45,11 +47,21 @@ export const ProfileFollowButton = ({ authorId, userId }: { authorId: string, us
         }
     };
 
+    if (isCurrentUser) {
+        return (
+            <button className="text-body-bold tracking-wide bg-dark-1 text-light-4 border-2 border-light-4 mt-4 px-14 py-2 rounded-md">
+                Edit
+            </button>
+        );
+    }
+
     return (
         <button className={`${isFollowing ? "bg-dark-1 text-light-4 border-2 border-light-4" : "bg-light-1"} mt-4 px-14 py-2 rounded-md`}
-        onClick={() => isFollowing ? handleUnfollow() : handleFollow()}
+            onClick={() => {
+                isFollowing ? handleUnfollow() : handleFollow()
+            }}
         >
-            {isFollowing ? "Following" : "Follow"}
-            </button>
-    )
+           {isFollowing ? "Unfollow" : "Follow"}
+        </button>
+    );
 }
