@@ -254,6 +254,7 @@ export async function likePost({ postId, userId, path }: { postId: string, userI
     post.likes.push(like._id)
     await post.save();
 
+    await User.findByIdAndUpdate(post.author, { $inc: { totalLikes: 1 } });
 
     revalidatePath(path);
   } catch (error) {
@@ -264,12 +265,15 @@ export async function likePost({ postId, userId, path }: { postId: string, userI
 export async function unLikePost({ postId, userId, path }: { postId: string, userId: string, path: string }) {
   try {
     connectToDB();
+    const post = await Thread.findById(postId)
 
     const like = await Like.findOne({ likedPost: postId, likedUser: userId })
 
     console.log("The unlike:", like)
 
     await Like.findByIdAndDelete(like._id);
+
+    await User.findByIdAndUpdate(post.author, { $inc: { totalLikes: -1 } });
 
     revalidatePath(path)
   } catch (error) {
@@ -295,69 +299,8 @@ export async function getInitialLikeState({ postId, userId }: { postId: string, 
     return {
       isLiked: false,
       likeCount: 0,
-    }; // Return false in case of an error
-  }
-}
-
-export async function getFollowersIds({ authorId }: { authorId: string }) {
-  try {
-    connectToDB();
-
-    const author = await User.findById(authorId);
-
-    if (!author) {
-      // Return an error response when the author is not found
-      throw new Error('Author not found');
-    }
-
-    // Use reduce to accumulate followers IDs
-    const followersIds = author.followers.reduce((acc, follower) => {
-      acc.push(follower.toString());
-      return acc;
-    }, []);
-
-    return followersIds;
-  } catch (error) {
-    console.error('Error fetching followers ids:', error);
-    throw new Error('Internal Server Error'); // You can customize this error message
-  }
-}
-
-export async function getFollowers({ userId }: { userId: string }) {
-  try {
-    connectToDB();
-    const user = await User.findById(userId);
-
-    if (!user) {
-      throw new Error('User Not Found');
-    }
-
-    const followers = await User.find({ _id: { $in: user.followers } });
-    const followersNumber = followers.length;
-
-    return { followers, followersNumber };
-  } catch (error) {
-    console.error('Error in fetching users:', error);
-    throw new Error('Error in fetching users');
+    };
   }
 }
 
 
-export async function getFollowing({ userId }: { userId: string }) {
-  try {
-    connectToDB();
-
-    const user = await User.findById(userId);
-
-    if (!user) {
-      throw new Error('User Not Found');
-    }
-
-    const following = user.following;
-    const followingNumber = following.length;
-
-    return { following, followingNumber };
-  } catch (error) {
-    throw new Error('Error in fetching users');
-  }
-}

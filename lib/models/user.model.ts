@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
             ref: 'User'
         }
     ],
+    totalLikes: {
+        type: Number,
+        default: 0,
+    },
     onboarded: {
         type: Boolean,
         default: false

@@ -1,6 +1,6 @@
 "use server";
 
-import { FilterQuery, SortOrder } from "mongoose";
+import mongoose, { FilterQuery, SortOrder } from "mongoose";
 import { revalidatePath } from "next/cache";
 
 import Community from "../models/community.model"
@@ -18,6 +18,7 @@ export async function fetchUser(userId: string) {
       path: "communities",
       model: Community,
     });
+
   } catch (error: any) {
     throw new Error(`Failed to fetch user: ${error.message}`);
   }
@@ -308,3 +309,105 @@ export async function unfollow({ followedUserId, userId }: { followedUserId: str
 }
 
 
+export async function calculateTotalLikes(userId: string): Promise<number> {
+  try {
+    await connectToDB();
+
+    // Fetch posts that belong to the user and do not have a parent
+    const posts = await Thread.find({ author: userId, parentId: null }).lean();
+
+    if (!posts || posts.length === 0) {
+      return 0;
+    }
+
+    // Calculate total likes from top-level posts only
+    const totalLikes = posts.reduce((acc, post) => {
+      const postLikes = Array.isArray(post.likes) ? post.likes.length : 0;
+      return acc + postLikes;
+    }, 0);
+
+    return totalLikes;
+  } catch (error) {
+    console.error('Error calculating total likes:', error);
+    throw error;
+  }
+} export async function getFollowing({ userId }: { userId: string; }) {
+  try {
+    connectToDB();
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new Error('User Not Found');
+    }
+
+    const following = await User.find({ _id: { $in: user.following } });
+    const followingNumber = following.length;
+
+    return { following, followingNumber };
+  } catch (error) {
+    console.error('Error in fetching users:', error);
+    throw new Error('Error in fetching users');
+  }
+}
+export async function getFollowers({ userId }: { userId: string; }) {
+  try {
+    connectToDB();
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new Error('User Not Found');
+    }
+
+    const followers = await User.find({ _id: { $in: user.followers } });
+    const followersNumber = followers.length;
+
+    return { followers, followersNumber };
+  } catch (error) {
+    console.error('Error in fetching users:', error);
+    throw new Error('Error in fetching users');
+  }
+}
+export async function getFollowersIds({ authorId }: { authorId: string; }) {
+  try {
+    connectToDB();
+
+    const author = await User.findById(authorId);
+
+    if (!author) {
+      // Return an error response when the author is not found
+      throw new Error('Author not found');
+    }
+
+    // Use reduce to accumulate followers IDs
+    const followersIds = author.followers.reduce((acc, follower) => {
+      acc.push(follower.toString());
+      return acc;
+    }, []);
+
+    return followersIds;
+  } catch (error) {
+    console.error('Error fetching followers ids:', error);
+    throw new Error('Internal Server Error'); // You can customize this error message
+  }
+}
+
+export async function initializeTotalLikes() {
+  await connectToDB();
+
+  try {
+    const users = await User.find();
+
+    for (const user of users) {
+      const userId = new mongoose.Types.ObjectId(user._id); // Cast user ID to ObjectId using 'new'
+      const posts = await Thread.find({ author: userId, parentId: null });
+      const totalLikes = posts.reduce((acc, post) => acc + (post.likes.length || 0), 0);
+
+      await User.findByIdAndUpdate(userId, { totalLikes });
+    }
+
+    console.log('Total likes initialized for all users.');
+  } catch (error) {
+    console.error('Error initializing total likes:', error);
+    throw error;
+  }
+}

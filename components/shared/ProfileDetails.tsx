@@ -1,15 +1,17 @@
 "use client"
 
-import { getFollowers, getFollowing } from '@/lib/actions/thread.actions';
+import { getFollowers } from "@/lib/actions/user.action";
+import { getFollowing } from "@/lib/actions/user.action";
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { TotalLikes } from './TotalLikes';
 
-export const ProfileDetails = ({ userId }: { userId: string }) => {
+export const ProfileDetails = ({ userId, accountId }: { userId: string, accountId: string }) => {
 
     const [followers, setFollowers] = useState([]);
-    const [followersCount, setFollowersCount] = useState(0);
+    const [followersCount, setFollowersCount] = useState("-")
     const [following, setFollowing] = useState([]);
-    const [followingCount, setFollowingCount] = useState(0);
+    const [followingCount, setFollowingCount] = useState("-");
     const parsedId = JSON.parse(userId);
     const pathname = usePathname();
     const router = useRouter();
@@ -34,10 +36,9 @@ export const ProfileDetails = ({ userId }: { userId: string }) => {
         fetchDetails();
     }, [userId]);
 
-
     return (
         <>
-            <div className="flex flex-col items-center gap-1.5 px-3">
+            <div onClick={() => router.push(`${pathname}/following`)} className="flex flex-col items-center cursor-pointer gap-1.5 px-3">
                 <span className="font-bold">{followingCount}</span>
                 <span className="text-light-3">Following</span>
             </div>
@@ -53,10 +54,7 @@ export const ProfileDetails = ({ userId }: { userId: string }) => {
 
             <div className="thread-card_bar h-8 w-0.5" />
 
-            <div className="flex flex-col items-center gap-1.5 px-3">
-                <span className="font-bold">10</span>
-                <span className="text-light-3">Likes</span>
-            </div>
+            <TotalLikes accountId={accountId} userId={userId} />
         </>
     )
 }

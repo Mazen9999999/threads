@@ -14,7 +14,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import Link from 'next/link';
-import { getFollowersIds } from '@/lib/actions/thread.actions';
+import { getFollowersIds } from "@/lib/actions/user.action";
 import { revalidatePath } from 'next/cache';
 
 const ProfileImage = ({ userId, author }: { userId: string, author: any }) => {
@@ -45,10 +45,10 @@ const ProfileImage = ({ userId, author }: { userId: string, author: any }) => {
         }
     };
 
-  
+
     return (
         <button className="relative h-11 w-11">
-            {!isFollowing ? (
+            {!isFollowing && parsedUserId !== parsedAuthor._id ? (
                 <AlertDialog>
                     <AlertDialogTrigger>
                         <Image

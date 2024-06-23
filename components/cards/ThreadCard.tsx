@@ -56,15 +56,6 @@ const ThreadCard = async ({
                 <div className="flex items-start justify-between relative">
                     <div className="flex w-full flex-1 flex-row gap-4">
                         <div className="flex flex-col items-center relative">
-                            {/* <Link href={`/profile/${author.id}`} className="relative h-11 w-11">
-                                <Image
-                                    src={author.image}
-                                    alt={"profile image"}
-                                    fill
-                                    className="cursor-pointer rounded-full "
-                                />
-                            </Link> */}
-
                             <ProfileImage author={JSON.stringify(author)} userId={JSON.stringify(userInfo._id)} />
 
                             <div className="thread-card_bar" />

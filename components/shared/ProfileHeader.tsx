@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ProfileFollowButton } from "./ProfileFollowButton";
-import { getFollowers } from "@/lib/actions/thread.actions";
+import { getFollowers } from "@/lib/actions/user.action";
 import { ProfileDetails } from "./ProfileDetails";
 
 interface Props {
@@ -15,9 +15,6 @@ interface Props {
 }
 
 const ProfileHeader = async ({ accountId, authUserId, authorId, name, username, imgUrl, bio, type }: Props) => {
-
-    // let { followersNumber } = await getFollowers({ userId: authorId });
-    // let {followers} = await getFollowers({ userId: authorId });
 
     return (
         <div className="flex w-full flex-col items-center justify-center">
@@ -40,12 +37,13 @@ const ProfileHeader = async ({ accountId, authUserId, authorId, name, username, 
             </div>
 
             <div className="flex items-center justify-center text-light-1 mt-6 gap-3 -ml-5">
-               <ProfileDetails userId={JSON.stringify(authorId)}/>
+
+                <ProfileDetails accountId={JSON.stringify(accountId)} userId={JSON.stringify(authorId)} />
             </div>
 
             <p className="mt-6 max-w-lg text-base-regular text-light-2">{bio}</p>
 
-            <ProfileFollowButton authorId={JSON.stringify(authorId)} userId={authUserId} />
+            <ProfileFollowButton authorId={JSON.stringify(authorId)} userId={JSON.stringify(authUserId)} />
 
             <div className="mt-12 h-0.5 w-full bg-dark-3" />
         </div>
