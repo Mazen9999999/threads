@@ -284,16 +284,16 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
 
-            // Check file size (example: limit to 5MB)
-            const MAX_SIZE_MB = 5;
+            // Increase file size limit (example: limit to 10MB)
+            const MAX_SIZE_MB = 10;
             if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-                alert("File size exceeds the limit of 5MB.");
+                alert("File size exceeds the limit of 10MB.");
                 return;
             }
 
             try {
                 // Compress image
-                const compressedFile = await imageCompression(file, { maxSizeMB: 1, maxWidthOrHeight: 1024 });
+                const compressedFile = await imageCompression(file, { maxSizeMB: 5, maxWidthOrHeight: 1920 });
 
                 setFiles([compressedFile]);
 
