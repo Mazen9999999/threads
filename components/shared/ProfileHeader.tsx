@@ -38,7 +38,7 @@ const ProfileHeader = async ({ accountId, authUserId, authorId, name, username, 
 
             <div className="flex items-center justify-center text-light-1 mt-6 gap-3 -ml-5">
 
-                <ProfileDetails accountId={JSON.stringify(accountId)} userId={JSON.stringify(authorId)} />
+                <ProfileDetails userId={JSON.stringify(authorId)} />
             </div>
 
             <p className="mt-6 max-w-lg text-base-regular text-light-2">{bio}</p>

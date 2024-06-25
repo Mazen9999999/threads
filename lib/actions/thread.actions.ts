@@ -154,6 +154,8 @@ export async function deleteThread(id: string, path: string): Promise<void> {
       { $pull: { threads: { $in: descendantThreadIds } } }
     );
 
+    await Like.deleteMany({ likedPost: id });
+
     revalidatePath(path);
   } catch (error: any) {
     throw new Error(`Failed to delete thread: ${error.message}`);
@@ -245,7 +247,7 @@ export async function addCommentToThread(
 export async function likePost({ postId, userId, path }: { postId: string, userId: string, path: string }) {
   try {
     connectToDB();
-
+    
     const post = await Thread.findById(postId)
 
     const like = new Like({ likedPost: postId, likedUser: userId })
@@ -253,8 +255,6 @@ export async function likePost({ postId, userId, path }: { postId: string, userI
 
     post.likes.push(like._id)
     await post.save();
-
-    await User.findByIdAndUpdate(post.author, { $inc: { totalLikes: 1 } });
 
     revalidatePath(path);
   } catch (error) {
@@ -272,8 +272,6 @@ export async function unLikePost({ postId, userId, path }: { postId: string, use
     console.log("The unlike:", like)
 
     await Like.findByIdAndDelete(like._id);
-
-    await User.findByIdAndUpdate(post.author, { $inc: { totalLikes: -1 } });
 
     revalidatePath(path)
   } catch (error) {
@@ -293,7 +291,6 @@ export async function getInitialLikeState({ postId, userId }: { postId: string, 
       likeCount,
     };
 
-
   } catch (error) {
     console.error('Error checking initial like state:', error);
     return {
@@ -303,4 +300,21 @@ export async function getInitialLikeState({ postId, userId }: { postId: string, 
   }
 }
 
+export async function calculateUserTotalLikes(userId) {
+  try {
+    await connectToDB();
 
+    // Find all posts by the user
+    const posts = await Thread.find({ author: userId });
+
+    // Extract post IDs
+    const postIds = posts.map(post => post._id);
+
+    // Count the total number of likes for all the user's posts
+    const totalLikes = await Like.countDocuments({ likedPost: { $in: postIds } });
+    return totalLikes;
+  } catch (error) {
+    console.error('Error calculating total likes for user:', error);
+    throw new Error('Unable to calculate total likes for user');
+  }
+}

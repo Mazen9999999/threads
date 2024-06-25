@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { TotalLikes } from './TotalLikes';
 
-export const ProfileDetails = ({ userId, accountId }: { userId: string, accountId: string }) => {
+export const ProfileDetails = ({ userId }: { userId: string }) => {
 
     const [followers, setFollowers] = useState([]);
     const [followersCount, setFollowersCount] = useState("-")
@@ -54,7 +54,7 @@ export const ProfileDetails = ({ userId, accountId }: { userId: string, accountI
 
             <div className="thread-card_bar h-8 w-0.5" />
 
-            <TotalLikes accountId={accountId} userId={userId} />
+            <TotalLikes userId={userId} />
         </>
     )
 }

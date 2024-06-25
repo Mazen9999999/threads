@@ -2,6 +2,7 @@
 
 import { getFollowersIds } from "@/lib/actions/user.action";
 import { fetchUser, follow, unfollow } from "@/lib/actions/user.action";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export const ProfileFollowButton = ({ authorId, userId }: { authorId: string, userId: string }) => {
@@ -10,7 +11,8 @@ export const ProfileFollowButton = ({ authorId, userId }: { authorId: string, us
     const [doesAuthorFollow, setDoesAuthorFollow] = useState(false);
     const parsedAuthorId = JSON.parse(authorId);
     const parsedUserId = JSON.parse(userId);
-
+    const pathname = usePathname();
+    const router = useRouter();
 
     useEffect(() => {
         const checkIfCurrentUserIsFollowing = async () => {
@@ -56,7 +58,7 @@ export const ProfileFollowButton = ({ authorId, userId }: { authorId: string, us
 
     if (isCurrentUser) {
         return (
-            <button className="text-body-bold tracking-wide bg-dark-1 text-light-4 border-2 border-light-4 mt-4 px-14 py-2 rounded-md">
+            <button onClick={() => router.push('edit')} className="text-body-bold tracking-wide bg-dark-1 text-light-4 border-2 border-light-4 mt-4 px-14 py-2 rounded-md">
                 Edit
             </button>
         );

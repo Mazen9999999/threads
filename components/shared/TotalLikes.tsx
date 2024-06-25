@@ -1,19 +1,17 @@
 "use client"
 
-import { calculateTotalLikes, fetchUser, fetchUserPosts } from "@/lib/actions/user.action";
+import { calculateUserTotalLikes } from "@/lib/actions/thread.actions";
 import { useEffect, useState } from "react";
 
-export const TotalLikes = ({ userId, accountId }: { userId: string, accountId: string }) => {
+export const TotalLikes = ({ userId }: { userId: string}) => {
   const [totalLikes, setTotalLikes] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const parsedUserId = JSON.parse(userId)
-  const parsedAccountId = JSON.parse(accountId)
   useEffect(() => {
     const fetchTotalLikes = async () => {
       try {
-        const user = await fetchUser(parsedAccountId);
-        setTotalLikes(user.totalLikes || 0);
+      setTotalLikes(await calculateUserTotalLikes(parsedUserId))
       } catch (error) {
         console.error('Error fetching total likes:', error);
       } finally {
